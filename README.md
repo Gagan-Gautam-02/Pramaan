@@ -13,6 +13,30 @@ Pramaan is a modular platform that combines multiple state-of-the-art deepfake d
 
 **Add a new model in minutes, retrain the ensemble in one command.**
 
+## Project Overview
+Pramaan is an enterprise-grade deepfake detection platform designed to provide a definitive answer to the question: "Is this media real or fake?" In an era where AI-generated content is becoming indistinguishable from reality, Pramaan acts as an orchestration layer that leverages the collective intelligence of multiple state-of-the-art detection models. 
+
+Built on a modular microservices architecture, the platform handles images, videos, and audio with ease. By isolating each detection model in its own Docker container, Pramaan ensures high reliability and easy extensibility. The core innovation lies in its ensemble decision-making process, where results from various "expert" AIs are fused using advanced mathematical strategies, including a trained stacking meta-learner that learns which models to trust for specific types of data. This approach significantly reduces false positives and provides a robust, forensic-quality verdict backed by multi-model consensus.
+
+## Tech Stack
+*   **Infrastructure**: Docker, Docker Compose, Nginx
+*   **Backend**: FastAPI, Python 3.9+, SQLAlchemy, Pydantic, HTTPX
+*   **Frontend**: React (Vite), Tailwind CSS
+*   **AI/ML**: PyTorch, Scikit-learn, XGBoost, LightGBM, Optuna
+*   **Storage**: SQLite (Analysis History), Local Volumes (Model Weights)
+
+## Challenges Faced
+*   **Dependency Isolation**: Handling disparate environment requirements for multiple AI models was solved through specialized Docker containers for each "expert" model.
+*   **Intelligent Fusion**: Developing a meta-learner that outperforms simple voting by understanding the strengths and weaknesses of individual models across different generators.
+*   **Orchestration Latency**: Minimising the time-to-verdict by implementing parallel model dispatch in the FastAPI gateway using asynchronous workers.
+*   **Adversarial Evolution**: Creating a "plug-and-play" architecture that allows for the rapid integration of new detectors as generative AI models continue to evolve.
+
+## Additional Notes
+*   **Modular SDK**: The platform includes a dedicated SDK (`pramaan_sdk`) that simplifies the process of wrapping any new detection research into a Pramaan-compatible service.
+*   **Local-First Privacy**: Designed to be deployed entirely within an organization's own infrastructure, ensuring sensitive media files never leave the local network.
+*   **Data-Driven**: The system comes with a retraining pipeline that consumes a balanced multi-modal benchmark of over 6,000 samples to keep the ensemble optimized.
+
+
 <div align="center">
   <img src="docs/images/dashboard_1.png" alt="Dashboard" width="90%">
 </div>
