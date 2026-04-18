@@ -65,6 +65,31 @@ Every model container exposes two endpoints: `GET /health` and `POST /predict`. 
 
 ---
 
+## Core Features & Workflow
+
+### 1. The Expert Ensemble (Decision Fusing)
+Pramaan does not rely on a single AI detector. Instead, it aggregates opinions from a "panel of experts" to minimize false positives:
+*   **Neural Pattern Recognition (NPR)**: Specialized in identifying high-frequency noise and pixel-level artifacts.
+*   **UniversalFakeDetect**: A semantic generalist that excels at recognizing fakes from diverse generators (Midjourney, DALL-E, Flux).
+*   **Cross-Efficient ViT**: A temporal-aware transformer optimized for detecting frame-level inconsistencies in video.
+
+These scores are fused using **Stacking Meta-Learning**, which employs a classifier trained on thousands of known samples to intelligently weigh each expert's confidence based on the modality.
+
+### 2. Plug-and-Play Architecture
+Pramaan is built for the future. As new generative AI models emerge, new detectors can be added in minutes:
+*   **Scaffold**: Use `make add-model` to generate a standardized model microservice.
+*   **Implement**: Use the `pramaan_sdk` to wrap any research model with a consistent API.
+*   **Deploy**: The Gateway automatically discovers the new model and incorporates its signal into the ensemble.
+
+### 3. Program Flow (Data Journey)
+1.  **Ingress**: Media is uploaded through the Dashboard to the central FastAPI Gateway.
+2.  **Dispatch**: The Gateway identifies the media type and dispatches the data to all relevant model services in parallel.
+3.  **Isolation**: Each model performs inference in its own isolated environment (Docker), ensuring no dependency conflicts.
+4.  **Consensus**: The Stacking Meta-Learner evaluates all returning probabilities.
+5.  **Final Verdict**: A forensic-grade verdict is produced, stored in the history database, and returned to the user.
+
+---
+
 ## Quick Start
 
 ```bash
