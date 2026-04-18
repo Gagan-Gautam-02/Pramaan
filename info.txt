@@ -1,0 +1,61 @@
+# Pramaan: A Comprehensive Yet Simple Guide
+
+## 1. What is Pramaan?
+Imagine you have a piece of media (like a photo or a video) and you're not sure if it's real or if it was generated/manipulated by AI (a "deepfake"). 
+
+If you ask just one expert to analyze it, they might make a mistake. But what if you could ask a whole panel of world-class experts at once, and have a "head judge" gather their opinions to give you a single, highly reliable final verdict?
+
+That is exactly how **Pramaan** works. It is an **Enterprise-grade deepfake detection platform** that brings together multiple top-tier AI models (the experts) to analyze images, videos, and audio, having them work together as an "ensemble" to catch fakes accurately.
+
+---
+
+## 2. Core Architecture (The Building Blocks)
+The system is built like a highly organized modern factory with specialized departments. It uses a technology called **Docker** (which puts each department in its own isolated software box or "container" so they don't interfere with each other):
+
+* **The User Interface (React SPA + Nginx):** This is the front desk. It's the visual dashboard running on your browser where users log in, upload their media files, and see the beautifully formatted results.
+* **The Gateway (FastAPI):** Think of this as the intelligent factory manager. When a user uploads a file, the Gateway receives it, figures out what kind of media it is (image vs. video), and securely routes it to the correct "experts" (the AI model services).
+* **The Model Services (The Experts):** These are the individual AIs. Each runs on its own completely independent mini-server. For example:
+  * **NPR (Neural Pattern Recognition):** An expert at spotting subtle, invisible noise patterns in fake images.
+  * **UniversalFakeDetect:** A generalist image expert that is good at recognizing fakes from many different AI generators (like Midjourney, DALL-E).
+  * **Cross-Efficient ViT:** An expert specifically trained to analyze frames in video deepfakes.
+  * Because they are isolated, if one expert crashes, the others still work perfectly.
+* **The Decision Maker (Ensemble Meta-Learner):** Built into the Gateway, this is the "head judge." Once all the experts reply with their confidence scores (e.g., "I'm 90% sure it's fake", "I'm 85% sure it's real"), the Decision Maker mathematically combines them to produce the final, conclusive verdict.
+
+---
+
+## 3. Key Features & Functions
+* **Multi-Modal Detection:** It doesn't just inspect photos; it has the architecture to handle videos and audio as well.
+* **Plug-and-Play Design:** Adding a new deepfake detection AI takes minutes. You just create an independent container for it and add its info to a configuration file. The Gateway automatically registers it and starts sending it files to analyze.
+* **Smart Ensemble Strategies:** Pramaan doesn't just blindly guess. It combines expert opinions using robust methods:
+  * **Voting:** Majority rules (if 2 AIs say fake and 1 says real, the system says fake).
+  * **Averaging:** Calculates the average mathematical probability.
+  * **Stacking:** Uses a highly trained Meta-AI to weigh the scores (explained below).
+* **Security & History:** Features user registration and login systems, and automatically saves a history of all previously analyzed media to a local database.
+
+---
+
+## 4. How It Works: A Step-by-Step Journey of an Uploaded Image
+Let's see what happens behind the scenes when you click "Upload" on the dashboard:
+
+1. **Upload:** You upload "photo.jpg" to the deepfake checker in your browser.
+2. **Routing:** The request goes straight to the Gateway manager. The Gateway knows this is an image, so it says, "I need to ask my current active image experts: NPR and UniversalFakeDetect."
+3. **Parallel Analysis:** To be fast, the Gateway sends "photo.jpg" to **both** NPR and UniversalFakeDetect at the exact same time.
+4. **Expert Examination:**
+   * NPR analyzes the high-frequency pixel noise and replies to the Gateway: "I am 75% confident it's fake."
+   * UniversalFakeDetect looks at the overall semantics and replies: "I am 88% confident it's fake."
+5. **The Final Verdict:** The Gateway takes these two scores and applies the chosen "Ensemble Strategy". Let's assume it uses the advanced "Stacking" method. A special built-in AI evaluates both scores and produces a highly accurate final confidence, concluding "91% Fake."
+6. **Delivery:** The Gateway saves this result to your personal history database and sends the report back to your browser, showing you the final decision alongside the individual opinions of each AI expert.
+
+---
+
+## 5. The "Stacking Meta-Learner" Explained simply
+What if you add a brand new AI model to the system? How does the "Head Judge" know whether to trust this new expert?
+
+Pramaan solves this with an advanced **Retraining Pipeline**. By running a simple command (`make retrain`), the system does the following:
+1. It feeds thousands of known real and known fake images to all the active experts.
+2. It records all of their guesses.
+3. It essentially trains a brand-new, overarching AI (the Meta-Learner) on these answers. 
+
+This new AI figures out things like: *"Expert A is really good at spotting Midjourney images, but sometimes gets confused by dark photos. Expert B is great with dark photos. Next time they disagree on a dark photo, I will trust Expert B."*
+
+This self-improving ensemble method ensures the combined system is always significantly more robust and accurate than relying on any single deepfake detector alone.

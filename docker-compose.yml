@@ -1,0 +1,133 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────────
+  #  Model Services (built from repo root for SDK access)
+  # ─────────────────────────────────────────────
+
+  npr_deepfakedetection:
+    build:
+      context: .
+      dockerfile: models/image/npr_deepfakedetection/Dockerfile
+    container_name: npr_deepfakedetection
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - NPR_WEIGHTS_PATH=/weights/npr_weights.pth
+    volumes:
+      - model_weights:/weights
+    networks:
+      - pramaan
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  universalfakedetect:
+    build:
+      context: .
+      dockerfile: models/image/universalfakedetect/Dockerfile
+    container_name: universalfakedetect
+    ports:
+      - "5004:5004"
+    environment:
+      - PORT=5004
+      - UFD_WEIGHTS_PATH=/weights/ufd_weights.pth
+    volumes:
+      - model_weights:/weights
+    networks:
+      - pramaan
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5004/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  cross_efficient_vit:
+    build:
+      context: .
+      dockerfile: models/video/cross_efficient_vit/Dockerfile
+    container_name: cross_efficient_vit
+    ports:
+      - "7001:7001"
+    environment:
+      - PORT=7001
+      - CEV_WEIGHTS_PATH=/weights/cev_weights.pth
+    volumes:
+      - model_weights:/weights
+    networks:
+      - pramaan
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  API Gateway
+  # ─────────────────────────────────────────────
+
+  gateway:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: pramaan_gateway
+    ports:
+      - "8001:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-CHANGE_ME_IN_PRODUCTION_use_openssl_rand_hex_32}
+      - DATABASE_URL=sqlite:////app/data/pramaan.db
+    volumes:
+      - gateway_data:/app/data
+      - ./config:/config:ro
+      - ./api/meta_model_artifacts:/app/meta_model_artifacts
+    depends_on:
+      - npr_deepfakedetection
+      - universalfakedetect
+      - cross_efficient_vit
+    networks:
+      - pramaan
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  Frontend (React SPA via Nginx)
+  # ─────────────────────────────────────────────
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pramaan_frontend
+    ports:
+      - "5000:80"
+    depends_on:
+      - gateway
+    networks:
+      - pramaan
+    restart: unless-stopped
+
+# ─────────────────────────────────────────────
+#  Shared resources
+# ─────────────────────────────────────────────
+
+volumes:
+  model_weights:
+  gateway_data:
+
+networks:
+  pramaan:
+    driver: bridge

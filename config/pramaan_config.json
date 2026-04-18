@@ -1,0 +1,43 @@
+{
+  "models": [
+    {
+      "name": "npr_deepfakedetection",
+      "display_name": "NPR Deepfake",
+      "media_type": "image",
+      "port": 5001,
+      "url": "http://npr_deepfakedetection:5001",
+      "description": "Neural Pattern Recognition for subtle artifact detection",
+      "enabled": true
+    },
+    {
+      "name": "universalfakedetect",
+      "display_name": "UniversalFakeDetect",
+      "media_type": "image",
+      "port": 5004,
+      "url": "http://universalfakedetect:5004",
+      "description": "CLIP-based detector that generalizes across generators",
+      "enabled": true
+    },
+    {
+      "name": "cross_efficient_vit",
+      "display_name": "Cross-Efficient ViT",
+      "media_type": "video",
+      "port": 7001,
+      "url": "http://cross_efficient_vit:7001",
+      "description": "EfficientNet + Vision Transformer for video analysis",
+      "enabled": true
+    }
+  ],
+  "ensemble": {
+    "default_method": "voting",
+    "stacking_artifact_path": "meta_model_artifacts"
+  },
+  "gateway": {
+    "host": "0.0.0.0",
+    "port": 8000,
+    "request_timeout_seconds": 30,
+    "secret_key": "CHANGE_ME_IN_PRODUCTION",
+    "algorithm": "HS256",
+    "access_token_expire_minutes": 60
+  }
+}
